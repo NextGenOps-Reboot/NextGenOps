@@ -26,7 +26,7 @@ Embed Diagram Here
 
 ### Clone the Repository
 ```bash
-git clone https://github.com/your-org/autonomous-intelligent-routing.git  
+git clone https://github.com/NextGenOps-Reboot/autonomous-intelligent-routing.git
 cd autonomous-intelligent-routing
 ```
 
