@@ -1,0 +1,41 @@
+name: Deploy to GCP
+
+on:
+  push:
+    branches:
+      - gcp-cicd
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      PROJECT_ID: ${{ secrets.GCP_PROJECT }}
+      CLUSTER: ${{ secrets.GKE_CLUSTER }}
+      ZONE: ${{ secrets.GKE_ZONE }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v2
+      with:
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+    - name: Set up gcloud SDK
+      uses: google-github-actions/setup-gcloud@v2
+      with:
+        project_id: ${{ secrets.GCP_PROJECT }}
+
+    - name: Get GKE credentials
+      run: |
+        gcloud container clusters get-credentials "$CLUSTER" --zone "$ZONE" --project "$PROJECT_ID"
+
+    - name: Deploy Kubernetes manifests
+      run: |
+        kubectl apply -f k8s/
+
+    - name: Deploy App Engine app (n8n-caller)
+      run: |
+        cd n8n-caller
+        gcloud app deploy app.yaml --quiet
