@@ -27,6 +27,17 @@ jobs:
       with:
         project_id: ${{ secrets.GCP_PROJECT }}
 
+    - name: Create GKE Autopilot Cluster (if not exists)
+      run: |
+        if gcloud container clusters describe "$CLUSTER" --region "$ZONE" --project "$PROJECT_ID" >/dev/null 2>&1; then
+          echo "GKE cluster '$CLUSTER' already exists."
+        else
+          echo "🚀 Creating Autopilot GKE cluster '$CLUSTER'..."
+          gcloud container clusters create-auto "$CLUSTER" \
+            --region "$ZONE" \
+            --project "$PROJECT_ID"
+        fi
+
     - name: Install gke-gcloud-auth-plugin
       run: |
         sudo mkdir -p /usr/share/keyrings
