@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: n8n
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: n8n
+  template:
+    metadata:
+      labels:
+        app: n8n
+    spec:
+      securityContext:
+        fsGroup: 1000  # 👈 Fixes permission issue for /home/node/.n8n
+
+      containers:
+        - name: n8n
+          image: n8nio/n8n:1.42.1
+          ports:
+            - containerPort: 5678
+          env:
+            - name: DB_TYPE
+              value: postgresdb  # ✅ Corrected
+            - name: DB_POSTGRESDB_HOST
+              value: 127.0.0.1
+            - name: DB_POSTGRESDB_PORT
+              value: "5432"
+            - name: DB_POSTGRESDB_USER
+              value: postgres
+            - name: DB_POSTGRESDB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-password
+                  key: password
+            - name: DB_POSTGRESDB_DATABASE
+              value: n8n
+            - name: N8N_ENCRYPTION_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: n8n-encryption-key
+                  key: key
+            - name: N8N_USER_MANAGEMENT_JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret
+                  key: key
+            - name: N8N_PORT
+              value: "5678"
+          volumeMounts:
+            - name: n8n-storage
+              mountPath: /home/node/.n8n
+          securityContext:
+            runAsUser: 1000  # 👈 Helps ensure correct user access
+
+        - name: cloudsql-proxy
+          image: gcr.io/cloudsql-docker/gce-proxy:1.33.0
+          command:
+            - "/cloud_sql_proxy"
+            - "-instances=autonomous-routing:us-central1:n8n-postgres=tcp:5432"
+            - "-credential_file=/secrets/cloudsql/credentials.json"
+          volumeMounts:
+            - name: cloudsql-instance-credentials
+              mountPath: /secrets/cloudsql
+              readOnly: true
+
+      volumes:
+        - name: n8n-storage
+          persistentVolumeClaim:
+            claimName: n8n-storage
+        - name: cloudsql-instance-credentials
+          secret:
+            secretName: cloudsql-instance-credentials
