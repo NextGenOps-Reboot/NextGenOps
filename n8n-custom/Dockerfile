@@ -1,14 +1,14 @@
 FROM n8nio/n8n:1.42.1
 
-# Switch to root for global install
 USER root
 
-# Install the LangChain nodes globally
-RUN npm install --global --production --omit=dev --no-optional --unsafe-perm \
-    @n8n/n8n-nodes-langchain
+# Create directory and init npm project
+RUN mkdir -p /home/node/.n8n/nodes && \
+    cd /home/node/.n8n/nodes && \
+    npm init -y && \
+    npm install --production --omit=dev --no-optional --unsafe-perm @n8n/n8n-nodes-langchain
 
-# Clean cache
-RUN npm cache clean --force
+# Fix permissions
+RUN chown -R node:node /home/node/.n8n
 
-# Go back to node user
 USER node
