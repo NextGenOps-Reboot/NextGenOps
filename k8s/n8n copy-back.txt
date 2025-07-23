@@ -21,22 +21,20 @@ spec:
           ports:
             - containerPort: 5678
           env:
+            - name: WEBHOOK_TUNNEL_URL
+              value: "https://autonomous-routing.uc.r.appspot.com"
             - name: N8N_HOST
               value: "0.0.0.0"
             - name: N8N_PORT
               value: "5678"
-            - name: N8N_PROTOCOL
-              value: "https"
             - name: N8N_EDITOR_BASE_URL
               value: "https://autonomous-routing.uc.r.appspot.com"
-            - name: WEBHOOK_TUNNEL_URL
+            - name: VUE_APP_URL_BASE_API
               value: "https://autonomous-routing.uc.r.appspot.com"
-            - name: N8N_PUSH_BACKEND
-              value: "websocket"
-            - name: N8N_ENDPOINT_WEBHOOK
-              value: "webhook"
-            - name: N8N_ENDPOINT_WEBHOOK_TEST
-              value: "webhook-test"
+            - name: N8N_PROTOCOL
+              value: "https"
+            - name: N8N_PORT
+              value: "5678"
             - name: OLLAMA_HOST
               value: "http://ollama:11434"
             - name: QDRANT_URL
