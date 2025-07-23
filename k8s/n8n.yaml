@@ -17,7 +17,7 @@ spec:
 
       containers:
         - name: n8n
-          image:  us-central1-docker.pkg.dev/autonomous-routing/nextgenops-ar/n8n-custom:latest
+          image: n8nio/n8n:latest
           ports:
             - containerPort: 5678
           env:
