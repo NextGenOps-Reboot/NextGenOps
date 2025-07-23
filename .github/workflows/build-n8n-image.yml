@@ -6,6 +6,7 @@ on:
       - gcp-cicd  # or your deploy branch like `gcp-cicd`
     paths:
       - 'n8n-custom/Dockerfile' 
+      
 
 jobs:
   build:

@@ -5,8 +5,14 @@ on:
     branches:
       - gcp-cicd
 
+  workflow_run:
+    workflows: ["Build & Push Custom n8n Image"]
+    types:
+      - completed
+
 jobs:
   deploy_to_gcp:
+    if: github.event_name == 'push' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
     runs-on: ubuntu-latest
     env:
       PROJECT_ID: ${{ secrets.GCP_PROJECT }}
