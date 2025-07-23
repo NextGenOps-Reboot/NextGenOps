@@ -6,7 +6,7 @@ on:
       - gcp-cicd
 
 jobs:
-  deploy to GCP:
+  deploy_to_gcp:
     runs-on: ubuntu-latest
     env:
       PROJECT_ID: ${{ secrets.GCP_PROJECT }}
