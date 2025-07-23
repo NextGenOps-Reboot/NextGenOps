@@ -24,7 +24,7 @@ spec:
             - name: DB_TYPE
               value: postgresdb  # ✅ Corrected
             - name: N8N_HOST
-              value: "0.0.0.0"
+              value: "autonomous-routing.uc.r.appspot.com"
             - name: N8N_SECURE_COOKIE
               value: "false"
             - name: DB_POSTGRESDB_HOST
