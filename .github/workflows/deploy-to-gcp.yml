@@ -65,10 +65,10 @@ jobs:
       run: |
         kubectl apply -f k8s/
 
-    - name: Deploy App Engine app (n8n-caller)
-      run: |
-        cd n8n-caller
-        gcloud app deploy app.yaml --quiet
+    # - name: Deploy App Engine app (n8n-caller)
+    #   run: |
+    #     cd n8n-caller
+    #     gcloud app deploy app.yaml --quiet
 
     - name: Build and deploy proxy to Cloud Run
       run: |
