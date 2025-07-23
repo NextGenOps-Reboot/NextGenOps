@@ -21,10 +21,12 @@ spec:
           ports:
             - containerPort: 5678
           env:
-            - name: DB_TYPE
-              value: postgresdb  # ✅ Corrected
             - name: N8N_DISABLE_PRODUCTION_MAIN_PROCESS
               value: "true"
+            - name: N8N_CUSTOM_EXTENSIONS
+              value: "/home/node/.n8n/nodes"
+            - name: DB_TYPE
+              value: postgresdb  # ✅ Corrected
             - name: N8N_HOST
               value: "0.0.0.0"
             - name: N8N_SECURE_COOKIE
