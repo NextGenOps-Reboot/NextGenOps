@@ -21,10 +21,28 @@ spec:
           ports:
             - containerPort: 5678
           env:
-            - name: DB_TYPE
-              value: postgresdb  # ✅ Corrected
+            - name: OLLAMA_HOST
+              value: "http://ollama:11434"
+            - name: QDRANT_URL
+              value: "http://qdrant:6333"
             - name: N8N_HOST
               value: "autonomous-routing.uc.r.appspot.com"
+            - name: N8N_PROTOCOL
+              value: "https"
+            - name: N8N_PORT
+              value: "5678"
+            - name: WEBHOOK_URL
+              value: "https://autonomous-routing.uc.r.appspot.com/"
+            - name: WEBHOOK_TUNNEL_URL
+              value: "https://autonomous-routing.uc.r.appspot.com"
+            - name: N8N_EDITOR_BASE_URL
+              value: "https://autonomous-routing.uc.r.appspot.com"
+            - name: VUE_APP_URL_BASE_API
+              value: "https://autonomous-routing.uc.r.appspot.com"
+            - name: N8N_DISABLE_PRODUCTION_MAIN_PROCESS
+              value: "true"            
+            - name: DB_TYPE
+              value: postgresdb  # ✅ Corrected
             - name: N8N_SECURE_COOKIE
               value: "false"
             - name: DB_POSTGRESDB_HOST
@@ -50,8 +68,6 @@ spec:
                 secretKeyRef:
                   name: jwt-secret
                   key: key
-            - name: N8N_PORT
-              value: "5678"
           volumeMounts:
             - name: n8n-storage
               mountPath: /home/node/.n8n
