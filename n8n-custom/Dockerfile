@@ -2,14 +2,11 @@ FROM n8nio/n8n:latest
 
 USER root
 
-# Create directory and init npm project
-RUN mkdir -p /home/node/.n8n/nodes && \
-    cd /home/node/.n8n/nodes && \
-    npm init -y && \
-    npm install --omit=dev --no-optional @n8n/n8n-nodes-langchain
+# Install the custom node into the global node_modules
+RUN npm install -g --omit=dev @n8n/n8n-nodes-langchain
 
-# Fix permissions
-RUN chown -R node:node /home/node/.n8n
+# Fix ownership
+RUN chown -R node:node /usr/local/lib/node_modules
 
 USER node
 
