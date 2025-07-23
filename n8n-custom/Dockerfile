@@ -6,9 +6,11 @@ USER root
 RUN mkdir -p /home/node/.n8n/nodes && \
     cd /home/node/.n8n/nodes && \
     npm init -y && \
-    npm install --production --omit=dev --no-optional --unsafe-perm @n8n/n8n-nodes-langchain
+    npm install --omit=dev --no-optional @n8n/n8n-nodes-langchain
 
 # Fix permissions
 RUN chown -R node:node /home/node/.n8n
 
 USER node
+
+
