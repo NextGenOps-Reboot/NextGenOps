@@ -17,12 +17,10 @@ spec:
 
       containers:
         - name: n8n
-          image: n8nio/n8n:latest
+          image: n8nio/n8n:1.42.1
           ports:
             - containerPort: 5678
           env:
-            - name: N8N_DISABLE_PRODUCTION_MAIN_PROCESS
-              value: "true"
             - name: DB_TYPE
               value: postgresdb  # ✅ Corrected
             - name: N8N_HOST
