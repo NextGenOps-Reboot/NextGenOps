@@ -23,6 +23,8 @@ spec:
           env:
             - name: DB_TYPE
               value: postgresdb  # ✅ Corrected
+            - name: N8N_DISABLE_PRODUCTION_MAIN_PROCESS
+              value: "true"
             - name: N8N_HOST
               value: "0.0.0.0"
             - name: N8N_SECURE_COOKIE
