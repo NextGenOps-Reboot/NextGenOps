@@ -24,7 +24,7 @@ spec:
             - name: N8N_DISABLE_PRODUCTION_MAIN_PROCESS
               value: "true"
             - name: N8N_CUSTOM_EXTENSIONS
-              value: "/home/node/.n8n/nodes"
+              value: "/usr/local/lib/node_modules"
             - name: DB_TYPE
               value: postgresdb  # ✅ Corrected
             - name: N8N_HOST
