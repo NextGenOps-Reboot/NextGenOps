@@ -21,14 +21,15 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: '18'  # Use the required Node.js version
+        node-version: '18'  # Adjust to your desired version
 
-    - name: Install Dependencies
+    - name: Install Dependencies in unit-tests folder
       run: |
-        cd unit-tests
-        npm install  # Install dependencies for your unit tests
+        cd unit-tests  # Navigate to the unit-tests folder
+        npm init -y  # Initialize package.json if it doesn't exist
+        npm install axios jest --save-dev  # Install axios and jest dependencies
 
-    - name: Run Unit Tests
+    - name: Run Service Tests
       run: |
-        cd unit-tests
-        npm test  # Run the unit tests using Jest or your preferred test framework
+        cd unit-tests  # Ensure we're in the unit-tests folder
+        npx jest test.js  # Run the unit test file located in unit-tests/test.js
