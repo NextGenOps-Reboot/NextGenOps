@@ -1,0 +1,35 @@
+name: Execute Unit Tests After Deploy to GCP
+
+on:
+  push:
+    branches:
+      - main
+  workflow_run:
+    workflows: ["Deploy to GCP"]  # Trigger after Deploy to GCP workflow finishes
+    types:
+      - completed
+
+jobs:
+  run_tests:
+    if: github.event_name == 'push' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'  # Adjust to your desired version
+
+    - name: Install Dependencies in unit-tests folder
+      run: |
+        cd unit-tests  # Navigate to the unit-tests folder
+        npm init -y  # Initialize package.json if it doesn't exist
+        npm install axios jest --save-dev  # Install axios and jest dependencies
+
+    - name: Run Service Tests
+      run: |
+        cd unit-tests  # Ensure we're in the unit-tests folder
+        npx jest test.js  # Run the unit test file located in unit-tests/test.js

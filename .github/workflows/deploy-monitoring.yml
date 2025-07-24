@@ -1,0 +1,74 @@
+name: Deploy to Monitoring
+
+on:
+  push:
+    branches:
+      - main
+
+  workflow_run:
+    workflows: ["Build & Push Custom n8n Image"]
+    types:
+      - completed
+
+jobs:
+  deploy_monitoring:
+    if: github.event_name == 'push' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
+    runs-on: ubuntu-latest
+    env:
+      PROJECT_ID: ${{ secrets.GCP_PROJECT }}
+      CLUSTER: ${{ secrets.GKE_CLUSTER }}
+      ZONE: ${{ secrets.GKE_ZONE }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v2
+      with:
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+    - name: Set up gcloud SDK
+      uses: google-github-actions/setup-gcloud@v2
+      with:
+        project_id: ${{ secrets.GCP_PROJECT }}
+
+    - name: Install gcloud alpha components
+      run: |
+        gcloud components install alpha --quiet
+
+    - name: Create Pod Restart Alert
+      run: |
+        if gcloud alpha monitoring policies list \
+          --filter='displayName="Pod Restarting Frequently"' \
+          --format='value(name)' | grep -q .; then
+          echo "Alert already exists."
+        else
+          echo "Creating pod restart alert..."
+          gcloud alpha monitoring policies create \
+            --policy-from-file=monitoring/pod-restart-alert.yaml
+        fi
+
+    - name: Create CPU Alert Policy
+      run: |
+        echo "Creating container CPU alert policy..."
+        gcloud alpha monitoring policies create \
+          --project="${{ secrets.GCP_PROJECT }}" \
+          --policy-from-file=monitoring/container-cpu-usage.yaml
+
+    - name: Create Memory Alert Policy
+      run: |
+        echo "Creating container memory alert policy..."
+        gcloud alpha monitoring policies create \
+          --project="${{ secrets.GCP_PROJECT }}" \
+          --policy-from-file=monitoring/container-memory-usage.yaml
+ 
+    - name: Create Uptime Check
+      run: |
+        gcloud monitoring uptime create "Uptime check" \
+          --project=${{ secrets.GCP_PROJECT }} \
+          --resource-type=uptime-url \
+          --resource-labels=host=autonomous-routing.uc.r.appspot.com \
+          --protocol=https \
+          --path="/" \
+          --port=443

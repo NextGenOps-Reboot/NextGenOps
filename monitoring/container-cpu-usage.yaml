@@ -1,0 +1,16 @@
+displayName: "High Container CPU Limit Utilization"
+combiner: "OR"
+conditions:
+  - displayName: "CPU utilization > 80%"
+    conditionThreshold:
+      filter: 'metric.type="kubernetes.io/container/cpu/limit_utilization" resource.type="k8s_container"'
+      aggregations:
+        - alignmentPeriod: "300s"
+          perSeriesAligner: "ALIGN_MEAN"
+      comparison: "COMPARISON_GT"
+      thresholdValue: 0.8
+      duration: "300s"
+documentation:
+  content: "Container CPU usage has exceeded 80% of its configured limit for the last 5 minutes."
+  mimeType: "text/markdown"
+enabled: true

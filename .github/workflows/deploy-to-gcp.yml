@@ -3,10 +3,16 @@ name: Deploy to GCP
 on:
   push:
     branches:
-      - gcp-cicd
+      - main
+
+  workflow_run:
+    workflows: ["Build & Push Custom n8n Image"]
+    types:
+      - completed
 
 jobs:
-  deploy:
+  deploy_to_gcp:
+    if: github.event_name == 'push' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
     runs-on: ubuntu-latest
     env:
       PROJECT_ID: ${{ secrets.GCP_PROJECT }}
@@ -27,6 +33,30 @@ jobs:
       with:
         project_id: ${{ secrets.GCP_PROJECT }}
 
+    - name: Create GKE Autopilot Cluster (if not exists)
+      run: |
+        if gcloud container clusters describe "$CLUSTER" --region "$ZONE" --project "$PROJECT_ID" >/dev/null 2>&1; then
+          echo "GKE cluster '$CLUSTER' already exists."
+        else
+          echo "🚀 Creating Autopilot GKE cluster '$CLUSTER'..."
+          gcloud container clusters create-auto "$CLUSTER" \
+            --region "$ZONE" \
+            --project "$PROJECT_ID"
+        fi
+
+    - name: Install gke-gcloud-auth-plugin
+      run: |
+        sudo mkdir -p /usr/share/keyrings
+        curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg \
+          | gpg --dearmor | sudo tee /usr/share/keyrings/cloud.google.gpg > /dev/null
+
+        echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" \
+          | sudo tee /etc/apt/sources.list.d/google-cloud-sdk.list
+
+        sudo apt-get update
+        sudo apt-get install -y google-cloud-sdk-gke-gcloud-auth-plugin
+
+
     - name: Get GKE credentials
       run: |
         gcloud container clusters get-credentials "$CLUSTER" --zone "$ZONE" --project "$PROJECT_ID"
@@ -35,7 +65,3 @@ jobs:
       run: |
         kubectl apply -f k8s/
 
-    - name: Deploy App Engine app (n8n-caller)
-      run: |
-        cd n8n-caller
-        gcloud app deploy app.yaml --quiet

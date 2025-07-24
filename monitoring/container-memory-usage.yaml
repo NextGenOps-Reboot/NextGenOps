@@ -1,0 +1,16 @@
+displayName: "High Container Memory Utilization"
+combiner: "OR"
+conditions:
+  - displayName: "Memory utilization > 80%"
+    conditionThreshold:
+      filter: 'metric.type="kubernetes.io/container/memory/limit_utilization" resource.type="k8s_container"'
+      aggregations:
+        - alignmentPeriod: "300s"
+          perSeriesAligner: "ALIGN_MEAN"
+      comparison: "COMPARISON_GT"
+      thresholdValue: 0.8
+      duration: "300s"
+documentation:
+  content: "Container memory usage has exceeded 80% of its configured memory limit for the last 5 minutes."
+  mimeType: "text/markdown"
+enabled: true
