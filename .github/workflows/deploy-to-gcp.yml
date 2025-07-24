@@ -65,20 +65,3 @@ jobs:
       run: |
         kubectl apply -f k8s/
 
-    # - name: Deploy App Engine app (n8n-caller)
-    #   run: |
-    #     cd n8n-caller
-    #     gcloud app deploy app.yaml --quiet
-
-    - name: Build and deploy proxy to Cloud Run
-      run: |
-        cd n8n-proxy
-        gcloud builds submit --tag gcr.io/$PROJECT_ID/n8n-proxy
-
-        gcloud run deploy n8n-proxy \
-          --image gcr.io/$PROJECT_ID/n8n-proxy \
-          --platform managed \
-          --region $ZONE \
-          --allow-unauthenticated \
-          --vpc-connector cloud-run-connector \
-          --egress-settings all-traffic
