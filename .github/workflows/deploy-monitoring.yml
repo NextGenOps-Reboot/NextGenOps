@@ -1,0 +1,108 @@
+name: Deploy to Monitoring
+
+on:
+  push:
+    branches:
+      - gcp-cicd
+
+  workflow_run:
+    workflows: ["Build & Push Custom n8n Image"]
+    types:
+      - completed
+
+jobs:
+  deploy_monitoring:
+    if: github.event_name == 'push' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
+    runs-on: ubuntu-latest
+    env:
+      PROJECT_ID: ${{ secrets.GCP_PROJECT }}
+      CLUSTER: ${{ secrets.GKE_CLUSTER }}
+      ZONE: ${{ secrets.GKE_ZONE }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v2
+      with:
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+    - name: Set up gcloud SDK
+      uses: google-github-actions/setup-gcloud@v2
+      with:
+        project_id: ${{ secrets.GCP_PROJECT }}
+
+    - name: Create Pod Restart Alert (if not exists)
+      run: |
+        if gcloud alpha monitoring policies list \
+          --filter='displayName="Pod Restarting Frequently"' \
+          --format='value(name)' | grep -q .; then
+          echo "Alert already exists."
+        else
+          echo "Creating pod restart alert..."
+          gcloud alpha monitoring policies create \
+            --policy-from-file=monitoring/pod-restart-alert.yaml
+        fi
+ 
+    - name: Create Node CPU Alert (if not exists)
+      run: |
+        if gcloud alpha monitoring policies list \
+          --filter='displayName="High Node CPU Usage"' \
+          --format='value(name)' | grep -q .; then
+          echo "Alert already exists."
+        else
+          echo "Creating Node CPU alert..."
+          gcloud alpha monitoring policies create \
+            --policy-from-file=monitoring/node-cpu-usage.yaml
+        fi
+
+    - name: Create Node Memory Usage Alert (if not exists)
+      run: |
+        if gcloud alpha monitoring policies list \
+          --filter='displayName="High Node Memory Usage"' \
+          --format='value(name)' | grep -q .; then
+          echo "Alert already exists."
+        else
+          echo "Creating node memory usage alert..."
+          gcloud alpha monitoring policies create \
+            --policy-from-file=monitoring/node-memory-usage.yaml
+        fi
+
+
+    - name: Create Node Not Ready Alert (if not exists)
+      run: |
+        if gcloud alpha monitoring policies list \
+          --filter='displayName="Node Not Ready"' \
+          --format='value(name)' | grep -q .; then
+          echo "Alert already exists."
+        else
+          echo "Creating node not ready alert..."
+          gcloud alpha monitoring policies create \
+            --policy-from-file=monitoring/node-not-ready.yaml
+        fi
+
+
+    - name: Create Deployment Unavailable Alert (if not exists)
+      run: |
+        if gcloud alpha monitoring policies list \
+          --filter='displayName="Deployment Unavailable Replicas"' \
+          --format='value(name)' | grep -q .; then
+          echo "Alert already exists."
+        else
+          echo "Creating deployment unavailable alert..."
+          gcloud alpha monitoring policies create \
+            --policy-from-file=monitoring/deployment-unavailable.yaml
+        fi
+
+    - name: Create Uptime Check
+      run: |
+        gcloud monitoring uptime create "Uptime check" \
+          --project=${{ secrets.GCP_PROJECT }} \
+          --resource-type=uptime-url \
+          --resource-labels=host=autonomous-routing.uc.r.appspot.com \
+          --protocol=https \
+          --path="/" \
+          --port=443
+
+

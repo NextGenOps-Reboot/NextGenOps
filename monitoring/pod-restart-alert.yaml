@@ -1,0 +1,16 @@
+displayName: "Pod Restarting Frequently"
+combiner: "OR"
+conditions:
+  - displayName: "High Pod Restart Rate"
+    conditionThreshold:
+      filter: 'metric.type="kubernetes.io/container/restart_count" resource.type="k8s_container"'
+      aggregations:
+        - alignmentPeriod: "300s"
+          perSeriesAligner: "ALIGN_RATE"
+      comparison: "COMPARISON_GT"
+      thresholdValue: 0.2
+      duration: "300s"
+documentation:
+  content: "Container is restarting more than expected in the last 5 minutes."
+  mimeType: "text/markdown"
+enabled: true
