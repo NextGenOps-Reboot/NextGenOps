@@ -8,8 +8,7 @@ Where **Empathy Meets Engineering** – a fully adaptive, intelligent triage and
 
 At the core of the system lies a feedback loop that continuously absorbs new workflows, documents, and interactions to improve accuracy and performance over time.
 
-## 📌 Workflow Overview
-
+## Workflow Overview
 ### 1. User Request Initiation
 A user submits a question or issue through a web interface.
 ### 2. Trigger n8n Workflow
@@ -22,15 +21,15 @@ The request is sent to **n8n**, which orchestrates the full automation flow
   → The matched content is used to respond to the user directly.
 ### 5. If a relevant match is not found
   → n8n calls **Ollama LLM** to generate a draft solution based on the request.
-### 5. 📨 Ticket Creation & Storage
+### 5. Ticket Creation & Storage
 - A ticket is created in appropriate ticketing tool Service Now, JIRA, etc. 
 - A ticket will be automatically routed based on the user's input, such as their department, the content of their request, and other contextual information. This allows the system to assign the ticket to the most appropriate team or support group, ensuring faster and more accurate resolution.
-### 6. 📚 Continuous Learning
+### 6. Continuous Learning
 - Accurate answers from resolved requests are added to the knowledge base to improve future search and response quality.
 
 ---
 
-## 🧰 Tech Stack
+## Tech Stack
 
 | Component     | Purpose                             |
 |---------------|-------------------------------------|
