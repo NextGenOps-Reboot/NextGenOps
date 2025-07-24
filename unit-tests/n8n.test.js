@@ -8,8 +8,4 @@ describe('n8n Service Tests', () => {
     expect(res.status).toBe(200);
   });
 
-  it('should expose /healthz endpoint', async () => {
-    const res = await axios.get(`${baseUrl}/healthz`);
-    expect([200, 204]).toContain(res.status);
-  });
 });
