@@ -33,6 +33,10 @@ jobs:
       with:
         project_id: ${{ secrets.GCP_PROJECT }}
 
+    - name: Install gcloud alpha components
+      run: |
+        gcloud components install alpha --quiet
+
     - name: Create Pod Restart Alert (if not exists)
       run: |
         if gcloud alpha monitoring policies list \
