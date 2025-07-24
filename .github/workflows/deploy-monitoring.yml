@@ -37,7 +37,7 @@ jobs:
       run: |
         gcloud components install alpha --quiet
 
-    - name: Create Pod Restart Alert (if not exists)
+    - name: Create Pod Restart Alert
       run: |
         if gcloud alpha monitoring policies list \
           --filter='displayName="Pod Restarting Frequently"' \
@@ -48,57 +48,21 @@ jobs:
           gcloud alpha monitoring policies create \
             --policy-from-file=monitoring/pod-restart-alert.yaml
         fi
+
+    - name: Create CPU Alert Policy
+      run: |
+        echo "Creating container CPU alert policy..."
+        gcloud alpha monitoring policies create \
+          --project="${{ secrets.GCP_PROJECT }}" \
+          --policy-from-file=monitoring/container-cpu-usage.yaml
+
+    - name: Create Memory Alert Policy
+      run: |
+        echo "Creating container memory alert policy..."
+        gcloud alpha monitoring policies create \
+          --project="${{ secrets.GCP_PROJECT }}" \
+          --policy-from-file=monitoring/container-memory-usage.yaml
  
-    - name: Create Node CPU Alert (if not exists)
-      run: |
-        if gcloud alpha monitoring policies list \
-          --filter='displayName="High Node CPU Usage"' \
-          --format='value(name)' | grep -q .; then
-          echo "Alert already exists."
-        else
-          echo "Creating Node CPU alert..."
-          gcloud alpha monitoring policies create \
-            --policy-from-file=monitoring/node-cpu-usage.yaml
-        fi
-
-    - name: Create Node Memory Usage Alert (if not exists)
-      run: |
-        if gcloud alpha monitoring policies list \
-          --filter='displayName="High Node Memory Usage"' \
-          --format='value(name)' | grep -q .; then
-          echo "Alert already exists."
-        else
-          echo "Creating node memory usage alert..."
-          gcloud alpha monitoring policies create \
-            --policy-from-file=monitoring/node-memory-usage.yaml
-        fi
-
-
-    - name: Create Node Not Ready Alert (if not exists)
-      run: |
-        if gcloud alpha monitoring policies list \
-          --filter='displayName="Node Not Ready"' \
-          --format='value(name)' | grep -q .; then
-          echo "Alert already exists."
-        else
-          echo "Creating node not ready alert..."
-          gcloud alpha monitoring policies create \
-            --policy-from-file=monitoring/node-not-ready.yaml
-        fi
-
-
-    - name: Create Deployment Unavailable Alert (if not exists)
-      run: |
-        if gcloud alpha monitoring policies list \
-          --filter='displayName="Deployment Unavailable Replicas"' \
-          --format='value(name)' | grep -q .; then
-          echo "Alert already exists."
-        else
-          echo "Creating deployment unavailable alert..."
-          gcloud alpha monitoring policies create \
-            --policy-from-file=monitoring/deployment-unavailable.yaml
-        fi
-
     - name: Create Uptime Check
       run: |
         gcloud monitoring uptime create "Uptime check" \
@@ -108,5 +72,3 @@ jobs:
           --protocol=https \
           --path="/" \
           --port=443
-
-
