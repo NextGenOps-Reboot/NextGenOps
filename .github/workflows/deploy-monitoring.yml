@@ -3,7 +3,7 @@ name: Deploy to Monitoring
 on:
   push:
     branches:
-      - gcp-cicd
+      - main
 
   workflow_run:
     workflows: ["Build & Push Custom n8n Image"]

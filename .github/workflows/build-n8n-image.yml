@@ -3,7 +3,7 @@ name: Build & Push Custom n8n Image
 on:
   push:
     branches:
-      - gcp-cicd  # or your deploy branch like `gcp-cicd`
+      - main
     paths:
       - 'n8n-custom/Dockerfile' 
       

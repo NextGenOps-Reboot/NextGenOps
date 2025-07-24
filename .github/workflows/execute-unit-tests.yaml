@@ -3,7 +3,7 @@ name: Execute Unit Tests After Deploy to GCP
 on:
   push:
     branches:
-      - gcp-cicd  # Adjust this to the branch you need
+      - main
   workflow_run:
     workflows: ["Deploy to GCP"]  # Trigger after Deploy to GCP workflow finishes
     types:
