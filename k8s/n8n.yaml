@@ -73,6 +73,10 @@ spec:
               mountPath: /home/node/.n8n
           securityContext:
             runAsUser: 1000  # 👈 Helps ensure correct user access
+          resources:
+            limits:
+              cpu: "500m"
+              memory: "1Gi"
 
         - name: cloudsql-proxy
           image: gcr.io/cloudsql-docker/gce-proxy:1.33.0
@@ -84,6 +88,10 @@ spec:
             - name: cloudsql-instance-credentials
               mountPath: /secrets/cloudsql
               readOnly: true
+          resources:
+            limits:
+              cpu: "500m"
+              memory: "1Gi"
 
       volumes:
         - name: n8n-storage
